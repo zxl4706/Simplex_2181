@@ -1,4 +1,5 @@
 #include "MyMesh.h"
+#include <math.h>
 void MyMesh::Init(void)
 {
 	m_bBinded = false;
@@ -276,7 +277,18 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+
+	float eachTriDegree = 360.0f / a_nSubdivisions;
+	vector3 centerPoint(0, 0, 0);
+	vector3 centerPeakPoint(0, 0, a_fHeight);
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		float tempDegree = (PI * eachTriDegree) / 180;
+		AddTri(vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0), centerPoint);
+		AddTri(centerPeakPoint, vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0));
+	}
+
 	// -------------------------------
 
 	// Adding information about color
@@ -300,7 +312,27 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+
+	float eachTriDegree = 360.0f / a_nSubdivisions;
+	vector3 centerPoint(0, 0, 0);
+	vector3 centerTopPoint(0, 0, a_fHeight);
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		float tempDegree = (PI * eachTriDegree) / 180;
+		AddTri(vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0), centerPoint);
+		AddTri(centerTopPoint, vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, a_fHeight));
+		
+		if (x > a_nSubdivisions / 2)
+		{
+			AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, a_fHeight), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0));
+		}	
+		else
+		{
+			AddQuad(vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, a_fHeight));
+
+		}
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -330,7 +362,20 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fOuterRadius * 2.0f, a_v3Color);
+	float eachTriDegree = 360.0f / a_nSubdivisions;
+	vector3 centerPoint(0, 0, 0);
+	vector3 centerTopPoint(0, 0, a_fHeight);
+
+	for (int x = 0; x < a_nSubdivisions; x++)
+	{
+		float tempDegree = (PI * eachTriDegree) / 180;
+		
+		AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, 0), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, 0), vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, 0));
+		AddQuad(vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, 0), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, 0));
+
+		AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, a_fHeight), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, a_fHeight), vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, a_fHeight));
+		AddQuad(vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, a_fHeight), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, a_fHeight));
+	}
 	// -------------------------------
 
 	// Adding information about color
@@ -387,7 +432,26 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 	Init();
 
 	// Replace this with your code
-	GenerateCube(a_fRadius * 2.0f, a_v3Color);
+
+	float tempSubdivisions = a_nSubdivisions;
+	float averageDistance = a_fRadius / a_nSubdivisions;
+	float eachTriDegree = 360.0f / tempSubdivisions;
+	std::vector<vector3> allPoints;
+	vector3 centerPoint(0, 0, 0);
+
+	for (int i = 3; i > 0; i--)
+	{
+		for (int x = 0; x < tempSubdivisions; x++)
+		{
+			float tempDegree = (PI * eachTriDegree) / 180;
+			AddTri(centerPoint, vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, centerPoint.z), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, centerPoint.z));
+		}
+
+		centerPoint.z += .3;
+	}
+
+
+
 	// -------------------------------
 
 	// Adding information about color
