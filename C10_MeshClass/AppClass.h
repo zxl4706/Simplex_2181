@@ -16,6 +16,8 @@ class Application
 {
 	MyMesh* m_pMesh = nullptr;
 	MyMesh* m_pMesh1 = nullptr;
+	std::vector<MyMesh*> m_boxList;
+	float m_translation = 0;
 
 	String m_sProgrammer = "Alberto Bobadilla - labigm@rit.edu";
 private:
