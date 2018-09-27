@@ -1,5 +1,9 @@
 #include "MyMesh.h"
 #include <math.h>
+#include <iostream>
+
+//Zhengren Lin, Section 2, DSA2 Assignment 2
+
 void MyMesh::Init(void)
 {
 	m_bBinded = false;
@@ -279,14 +283,14 @@ void MyMesh::GenerateCone(float a_fRadius, float a_fHeight, int a_nSubdivisions,
 	// Replace this with your code
 
 	float eachTriDegree = 360.0f / a_nSubdivisions;
-	vector3 centerPoint(0, 0, 0);
-	vector3 centerPeakPoint(0, 0, a_fHeight);
+	vector3 centerPoint(0, 0, -a_fHeight / 2);
+	vector3 centerPeakPoint(0, 0, a_fHeight / 2);
 
 	for (int x = 0; x < a_nSubdivisions; x++)
 	{
 		float tempDegree = (PI * eachTriDegree) / 180;
-		AddTri(vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0), centerPoint);
-		AddTri(centerPeakPoint, vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0));
+		AddTri(vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, -a_fHeight / 2), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, -a_fHeight / 2), centerPoint);
+		AddTri(centerPeakPoint, vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, -a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, -a_fHeight / 2));
 	}
 
 	// -------------------------------
@@ -314,22 +318,22 @@ void MyMesh::GenerateCylinder(float a_fRadius, float a_fHeight, int a_nSubdivisi
 	// Replace this with your code
 
 	float eachTriDegree = 360.0f / a_nSubdivisions;
-	vector3 centerPoint(0, 0, 0);
-	vector3 centerTopPoint(0, 0, a_fHeight);
+	vector3 centerPoint(0, 0, -a_fHeight / 2);
+	vector3 centerTopPoint(0, 0, a_fHeight / 2);
 
 	for (int x = 0; x < a_nSubdivisions; x++)
 	{
 		float tempDegree = (PI * eachTriDegree) / 180;
-		AddTri(vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0), centerPoint);
-		AddTri(centerTopPoint, vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, a_fHeight));
+		AddTri(vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, -a_fHeight / 2), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, -a_fHeight / 2), centerPoint);
+		AddTri(centerTopPoint, vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, a_fHeight / 2));
 		
 		if (x > a_nSubdivisions / 2)
 		{
-			AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, a_fHeight), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0));
+			AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, a_fHeight / 2), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, -a_fHeight / 2), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, -a_fHeight / 2));
 		}	
 		else
 		{
-			AddQuad(vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, 0), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, a_fHeight));
+			AddQuad(vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, -a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, -a_fHeight / 2), vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, a_fHeight / 2));
 
 		}
 	}
@@ -370,11 +374,16 @@ void MyMesh::GenerateTube(float a_fOuterRadius, float a_fInnerRadius, float a_fH
 	{
 		float tempDegree = (PI * eachTriDegree) / 180;
 		
-		AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, 0), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, 0), vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, 0));
-		AddQuad(vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, 0), vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, 0), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, 0));
+		AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, -a_fHeight / 2), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, -a_fHeight / 2), vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, -a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, -a_fHeight / 2));
+		AddQuad(vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, -a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, -a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, -a_fHeight / 2), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, -a_fHeight / 2));
 
-		AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, a_fHeight), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, a_fHeight), vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, a_fHeight));
-		AddQuad(vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, a_fHeight), vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, a_fHeight), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, a_fHeight));
+		AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, a_fHeight / 2), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, a_fHeight / 2), vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, a_fHeight / 2));
+		AddQuad(vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, a_fHeight / 2), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, a_fHeight / 2));
+
+		AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, -a_fHeight / 2), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, -a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, a_fHeight / 2), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, a_fHeight / 2));
+		AddQuad(vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, a_fHeight / 2), vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, -a_fHeight / 2), vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, -a_fHeight / 2));
+		AddQuad(vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, a_fHeight / 2), vector3(cos(tempDegree * x) * a_fInnerRadius, sin(tempDegree * x) * a_fInnerRadius, -a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fInnerRadius, sin(tempDegree *(x + 1))* a_fInnerRadius, -a_fHeight / 2));
+		AddQuad(vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, a_fHeight / 2), vector3(cos(tempDegree * x) * a_fOuterRadius, sin(tempDegree * x) * a_fOuterRadius, -a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, a_fHeight / 2), vector3(cos(tempDegree * (x + 1)) * a_fOuterRadius, sin(tempDegree *(x + 1))* a_fOuterRadius, -a_fHeight / 2));
 	}
 	// -------------------------------
 
@@ -414,6 +423,20 @@ void MyMesh::GenerateTorus(float a_fOuterRadius, float a_fInnerRadius, int a_nSu
 	CompleteMesh(a_v3Color);
 	CompileOpenGL3X();
 }
+
+vector3 Normalize(vector3 inputVector3, float inputRadius)
+{
+	double dx = inputVector3.x;
+	double dy = inputVector3.y;
+	double dz = inputVector3.z;
+
+	dx = (dx * inputRadius) / (sqrt((dx * dx) + (dy * dy) + (dz * dz)));
+	dy = (dy * inputRadius) / (sqrt((dx * dx) + (dy * dy) + (dz * dz)));
+	dz = (dz * inputRadius) / (sqrt((dx * dx) + (dy * dy) + (dz * dz)));
+
+	return vector3(dx, dy, dz);
+}
+
 void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Color)
 {
 	if (a_fRadius < 0.01f)
@@ -433,22 +456,99 @@ void MyMesh::GenerateSphere(float a_fRadius, int a_nSubdivisions, vector3 a_v3Co
 
 	// Replace this with your code
 
-	float tempSubdivisions = a_nSubdivisions;
-	float averageDistance = a_fRadius / a_nSubdivisions;
-	float eachTriDegree = 360.0f / tempSubdivisions;
-	std::vector<vector3> allPoints;
-	vector3 centerPoint(0, 0, 0);
+	//--------------------------THIS IS ATTEMPT TO DO RECURSIVE ---------------------//
 
-	for (int i = 3; i > 0; i--)
+	/*
+	std::vector<vector3> allVertices;
+
+	int temp = pow(2, a_nSubdivisions) + 1;
+
+	for (int z = 0; z < temp; z++)
 	{
-		for (int x = 0; x < tempSubdivisions; x++)
+		for (int y = 0; y < temp; y++)
 		{
-			float tempDegree = (PI * eachTriDegree) / 180;
-			AddTri(centerPoint, vector3(cos(tempDegree * x) * a_fRadius, sin(tempDegree * x) * a_fRadius, centerPoint.z), vector3(cos(tempDegree * (x + 1)) * a_fRadius, sin(tempDegree *(x + 1))* a_fRadius, centerPoint.z));
+			for (int x = 0; x < temp; x++)
+			{
+				double tempNum = pow(2, a_nSubdivisions);
+				vector3 temp(x / tempNum, y / tempNum, z / tempNum);
+				allVertices.push_back(temp);
+			}
 		}
-
-		centerPoint.z += .3;
 	}
+
+
+
+	for (int x = 0; x < allVertices.size() - 5; x++)
+	{
+		AddQuad(allVertices[x], allVertices[x + 1], allVertices[2 ^ (2) + (2 + x)], allVertices[2 ^ (2) + (x + 1)]);
+	}
+	*/
+
+	//0 1 6 5, 1 2 7 6
+
+
+	float fValue = 0.5;
+
+	vector3 point0(-fValue, -fValue, fValue); //0
+	point0 = Normalize(point0, a_fRadius);
+	vector3 point1(fValue, -fValue, fValue); //1
+	point1 = Normalize(point1, a_fRadius);
+	vector3 point2(fValue, fValue, fValue); //2
+	point2 = Normalize(point2, a_fRadius);
+	vector3 point3(-fValue, fValue, fValue); //3
+	point3 = Normalize(point3, a_fRadius);
+
+	vector3 point4(-fValue, -fValue, -fValue); //4
+	point4 = Normalize(point4, a_fRadius);
+	vector3 point5(fValue, -fValue, -fValue); //5
+	point5 = Normalize(point5, a_fRadius);
+	vector3 point6(fValue, fValue, -fValue); //6
+	point6 = Normalize(point6, a_fRadius);
+	vector3 point7(-fValue, fValue, -fValue); //7
+	point7 = Normalize(point7, a_fRadius);
+
+	vector3 point8((point2.x + point0.x) / 2, (point2.y + point0.y) / 2, (point2.z + point0.z) / 2);
+	point8 = Normalize(point8, a_fRadius);
+	vector3 point9((point6.x + point4.x) / 2, (point6.y + point4.y) / 2, (point6.z + point4.z) / 2);
+	point9 = Normalize(point9, a_fRadius);
+	vector3 point10((point4.x + point3.x) / 2, (point4.y + point3.y) / 2, (point4.z + point3.z) / 2);
+	point10 = Normalize(point10, a_fRadius);
+	vector3 point11((point1.x + point6.x) / 2, (point1.y + point6.y) / 2, (point1.z + point6.z) / 2);
+	point11 = Normalize(point11, a_fRadius);
+	vector3 point12((point7.x + point2.x) / 2, (point7.y + point2.y) / 2, (point7.z + point2.z) / 2);
+	point12 = Normalize(point12, a_fRadius);
+	vector3 point13((point1.x + point4.x) / 2, (point1.y + point4.y) / 2, (point1.z + point4.z) / 2);
+	point13 = Normalize(point13, a_fRadius);
+
+	AddTri(point0, point1, point8);
+	AddTri(point1, point2, point8);
+	AddTri(point2, point3, point8);
+	AddTri(point0, point8, point3);
+
+	AddTri(point9, point5, point4);
+	AddTri(point9, point6, point5);
+	AddTri(point9, point7, point6);
+	AddTri(point7, point9, point4);
+
+	AddTri(point4, point0, point10);
+	AddTri(point0, point3, point10);
+	AddTri(point3, point7, point10);
+	AddTri(point4, point10, point7);
+
+	AddTri(point1, point5, point11);
+	AddTri(point5, point6, point11);
+	AddTri(point6, point2, point11);
+	AddTri(point1, point11, point2);
+
+	AddTri(point3, point2, point12);
+	AddTri(point2, point6, point12);
+	AddTri(point6, point7, point12);
+	AddTri(point3, point12, point7);
+
+	AddTri(point4, point5, point13);
+	AddTri(point5, point1, point13);
+	AddTri(point1, point0, point13);
+	AddTri(point4, point13, point0);
 
 
 
