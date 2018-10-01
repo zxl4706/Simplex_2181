@@ -52,14 +52,39 @@ void Application::Display(void)
 	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
 
 	//calculate the current position
+	static int pointCounter = 0;
+	static float percentage = 1.0f;
 	vector3 v3CurrentPos;
-	
-
-
+	static vector3 	v3Start = m_stopsList[pointCounter];
+	static vector3 	v3End = m_stopsList[pointCounter + 1];
 
 
 	//your code goes here
-	v3CurrentPos = vector3(0.0f, 0.0f, 0.0f);
+
+
+	if (percentage >= 1.0)
+	{
+		if (pointCounter + 1 >= m_stopsList.size())
+		{
+			v3Start = m_stopsList[pointCounter];
+			pointCounter = 0;
+			v3End = m_stopsList[pointCounter];
+		}
+		else
+		{
+			v3Start = m_stopsList[pointCounter];
+			v3End = m_stopsList[pointCounter + 1];
+			pointCounter++;
+		}
+		percentage = 0;
+	}
+	else
+	{
+		percentage += 0.04;
+	}
+
+	v3CurrentPos = glm::lerp(v3Start, v3End, percentage);
+
 	//-------------------
 	
 
