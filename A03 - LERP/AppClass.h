@@ -52,8 +52,9 @@ private:
 	ControllerInput* m_pController[8]; //Controller
 	uint m_uActCont = 0; //Active Controller of the Application
 
-	int m_pointCounter = 0;
+
 	float m_percentage = 1.0f;
+	vector<int> m_OrbitCounter;
 
 public:
 #pragma region Constructor / Run / Destructor

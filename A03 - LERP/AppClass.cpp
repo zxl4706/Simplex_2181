@@ -38,21 +38,33 @@ void Application::InitVariables(void)
 		m_shapeList.push_back(m_pMeshMngr->GenerateTorus(fSize, fSize - 0.1f, 3, i, v3Color)); //generate a custom torus and add it to the meshmanager
 		
 		//------------------------------------------------------------------------------------------------------
+
+		//Generation of diffeernt coordinate for each torus
+
+		//Generate vector array and calculate the degree needed for the math of the vertices
 		vector<vector3> tempVectorPathing;
 		float eachTriDegree = 360.0f / (i);
 		vector3 centerPoint(0, 0, 0);
 
+		//Looping through to calculate for each vertices then push it onto vector array
 		for (int x = 0; x < i; x++)
 		{
 			float tempDegree = (PI * eachTriDegree) / 180;
 			tempVectorPathing.push_back(vector3(cos(tempDegree * x) * fSize, sin(tempDegree * x) * fSize, 0));
 		}
+
+		//Push the local vector onto the member vector array
 		vectorPathings.push_back(tempVectorPathing);
 
 		//------------------------------------------------------------------------------------------------------
 
 		fSize += 0.5f; //increment the size for the next orbit
 		uColor -= static_cast<uint>(decrements); //decrease the wavelength
+	}
+
+	for (int x = 0; x < m_uOrbits; x++)
+	{
+		m_OrbitCounter.push_back(0.0f);
 	}
 }
 void Application::Update(void)
@@ -79,45 +91,59 @@ void Application::Display(void)
 	*/
 	//m4Offset = glm::rotate(IDENTITY_M4, 1.5708f, AXIS_Z);
 
+	//Get a timer
+	static float fTimer = 0;	//store the new timer
+	static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+	fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+
+	//get the percentace
+	float fTimeBetweenStops = 2.0;//in seconds
+	//map the value to be between 0.0 and 1.0
+	float fPercentage = MapValue(fTimer, 0.0f, fTimeBetweenStops, 0.0f, 1.0f);
+
 	// draw a shapes
 	for (uint i = 0; i < m_uOrbits; i++)
 	{
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 1.5708f, AXIS_X));
 
-		vector3 v3Start = vectorPathings[i][m_pointCounter];
-		vector3 v3End = vectorPathings[i][m_pointCounter + 1];
+		//Initial the lerping coordinates of start and end
+		vector3 v3Start = vectorPathings[i][m_OrbitCounter[i]];
+		vector3 v3End;
 
-		//Get a timer
-		static float fTimer = 0;	//store the new timer
-		static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
-		fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+		//Condition to prevent out of bound access call in the vector array
+		if (m_OrbitCounter[i] + 1 >= vectorPathings[i].size())
+		{
+			//m_OrbitCounter[i] = 0;
+			v3End = vectorPathings[i][0];
+		}
+		else
+		{
+			v3End = vectorPathings[i][m_OrbitCounter[i] + 1];
+		}
+
+		//Condition to renew the start and end coordinate once the lerping ends
+		if(fPercentage > 1.0f)
+		{
+			fTimer = m_pSystem->GetDeltaTime(uClock);//restart the clock
+
+			if (m_OrbitCounter[i] + 1 >= vectorPathings[i].size())
+			{
+				v3Start = vectorPathings[i][m_OrbitCounter[i]];
+				m_OrbitCounter[i] = 0;
+				v3End = vectorPathings[i][m_OrbitCounter[i]];
+			}
+			else
+			{
+				v3Start = vectorPathings[i][m_OrbitCounter[i]];
+				m_OrbitCounter[i]++;
+				v3End = vectorPathings[i][m_OrbitCounter[i]];
+			}
+		}
 
 		//calculate the current position
 		vector3 v3CurrentPos;
 
-		if (m_percentage >= 1.0)
-		{
-			if (m_pointCounter + 1 >= vectorPathings[i].size() - 1)
-			{
-				m_pointCounter = 0;
-				v3Start = vectorPathings[i][m_pointCounter];
-				v3End = vectorPathings[i][m_pointCounter];
-			}
-			else
-			{				
-				m_pointCounter++;
-				v3Start = vectorPathings[i][m_pointCounter];
-				v3End = vectorPathings[i][m_pointCounter];
-
-			}
-			m_percentage = 0.0f;
-		}
-		else
-		{
-			m_percentage += 0.01f;
-		}
-
-		v3CurrentPos = glm::lerp(v3Start, v3End, m_percentage);
+		v3CurrentPos = glm::lerp(v3Start, v3End, fPercentage);
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
 		//draw spheres
