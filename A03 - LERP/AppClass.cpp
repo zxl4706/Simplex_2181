@@ -36,6 +36,21 @@ void Application::InitVariables(void)
 	{
 		vector3 v3Color = WaveLengthToRGB(uColor); //calculate color based on wavelength
 		m_shapeList.push_back(m_pMeshMngr->GenerateTorus(fSize, fSize - 0.1f, 3, i, v3Color)); //generate a custom torus and add it to the meshmanager
+		
+		//------------------------------------------------------------------------------------------------------
+		vector<vector3> tempVectorPathing;
+		float eachTriDegree = 360.0f / (i);
+		vector3 centerPoint(0, 0, 0);
+
+		for (int x = 0; x < i; x++)
+		{
+			float tempDegree = (PI * eachTriDegree) / 180;
+			tempVectorPathing.push_back(vector3(cos(tempDegree * x) * fSize, sin(tempDegree * x) * fSize, 0));
+		}
+		vectorPathings.push_back(tempVectorPathing);
+
+		//------------------------------------------------------------------------------------------------------
+
 		fSize += 0.5f; //increment the size for the next orbit
 		uColor -= static_cast<uint>(decrements); //decrease the wavelength
 	}
@@ -65,12 +80,44 @@ void Application::Display(void)
 	//m4Offset = glm::rotate(IDENTITY_M4, 1.5708f, AXIS_Z);
 
 	// draw a shapes
-	for (uint i = 0; i < m_uOrbits; ++i)
+	for (uint i = 0; i < m_uOrbits; i++)
 	{
 		m_pMeshMngr->AddMeshToRenderList(m_shapeList[i], glm::rotate(m4Offset, 1.5708f, AXIS_X));
 
+		vector3 v3Start = vectorPathings[i][m_pointCounter];
+		vector3 v3End = vectorPathings[i][m_pointCounter + 1];
+
+		//Get a timer
+		static float fTimer = 0;	//store the new timer
+		static uint uClock = m_pSystem->GenClock(); //generate a new clock for that timer
+		fTimer += m_pSystem->GetDeltaTime(uClock); //get the delta time for that timer
+
 		//calculate the current position
-		vector3 v3CurrentPos = ZERO_V3;
+		vector3 v3CurrentPos;
+
+		if (m_percentage >= 1.0)
+		{
+			if (m_pointCounter + 1 >= vectorPathings[i].size() - 1)
+			{
+				m_pointCounter = 0;
+				v3Start = vectorPathings[i][m_pointCounter];
+				v3End = vectorPathings[i][m_pointCounter];
+			}
+			else
+			{				
+				m_pointCounter++;
+				v3Start = vectorPathings[i][m_pointCounter];
+				v3End = vectorPathings[i][m_pointCounter];
+
+			}
+			m_percentage = 0.0f;
+		}
+		else
+		{
+			m_percentage += 0.01f;
+		}
+
+		v3CurrentPos = glm::lerp(v3Start, v3End, m_percentage);
 		matrix4 m4Model = glm::translate(m4Offset, v3CurrentPos);
 
 		//draw spheres
