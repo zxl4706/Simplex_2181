@@ -25,13 +25,42 @@ void Application::Display(void)
 	matrix4 m4View = m_pCameraMngr->GetViewMatrix();
 	matrix4 m4Projection = m_pCameraMngr->GetProjectionMatrix();
 
-	m_m4Model = glm::rotate(IDENTITY_M4, glm::radians(m_v3Rotation.x), vector3(1.0f, 0.0f, 0.0f));
-	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.y), vector3(0.0f, 1.0f, 0.0f));
-	m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.z), vector3(0.0f, 0.0f, 1.0f));
-	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_m4Model));
+	//m_m4Model = glm::rotate(IDENTITY_M4, glm::radians(m_v3Rotation.x), vector3(1.0f, 0.0f, 0.0f));
+	//m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.y), vector3(0.0f, 1.0f, 0.0f));
+	//m_m4Model = glm::rotate(m_m4Model, glm::radians(m_v3Rotation.z), vector3(0.0f, 0.0f, 1.0f));
+	//m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_m4Model));
+	
+	//Check if it's 0
+	if (m_v3Rotation.x != 0)
+	{
+		m_v3Rotation.x = 1;
+	}
+	else
+	{
+		m_v3Rotation.x = 0;
+	}
+	
+	if (m_v3Rotation.y != 0)
+	{
+		m_v3Rotation.y = 1;
+	}
+	else
+	{
+		m_v3Rotation.y = 0;
+	}
+	
+	if (m_v3Rotation.z != 0)
+	{
+		m_v3Rotation.z = 1;
+	}
+	else
+	{
+		m_v3Rotation.z = 0;
+	}
 
-	//m_qOrientation = m_qOrientation * glm::angleAxis(glm::radians(1.0f), vector3(1.0f));
-	//m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qOrientation));
+	//Normalize the angle axis
+	m_qOrientation = m_qOrientation * glm::normalize(glm::angleAxis(glm::radians(1.0f), vector3(m_v3Rotation.x, m_v3Rotation.y, m_v3Rotation.z)));
+	m_pMesh->Render(m4Projection, m4View, ToMatrix4(m_qOrientation));
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
