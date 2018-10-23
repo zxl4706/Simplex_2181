@@ -53,22 +53,86 @@ void Application::Display(void)
 		m_pCamera->ResetCamera();
 		break;
 	case 2:
-		m_pCamera->ResetCamera();
+		m_pCamera->SetPosition(vector3(0.0f, 0.0f, 10.0f)); //Where my camera is located
+		m_pCamera->SetTarget(vector3(0.0f, 0.0f, 0.0f)); //What I'm looking at
+		m_pCamera->SetUp(vector3(0.0f, 1.0f, 0.0f)); //What is up
+
+		m_pCamera->SetFOV(90.0f);
+
+		m_pCamera->SetPerspective(false); //perspective view? False is Orthographic
+
+		m_pCamera->SetResolution(vector2(1280.0f, 720.0f)); //Resolution of the window
+		m_pCamera->SetNearFar(vector2(0.001f, 1000.0f)); //Near and Far planes
+
+		m_pCamera->SetHorizontalPlanes(vector2(-5.0f, 5.0f)); //Ortographic horizontal projection
+		m_pCamera->SetVerticalPlanes(vector2(-5.0f, 5.0f)); //Ortographic vertical projection
 		break;
 	case 3:
-		m_pCamera->ResetCamera();
+		m_pCamera->SetPosition(vector3(0.0f, 1000.0f, 1.0f)); //Where my camera is located
+		m_pCamera->SetTarget(vector3(0.0f, 0.0f, 0.0f)); //What I'm looking at
+		m_pCamera->SetUp(vector3(0.0f, 1.0f, 0.0f)); //What is up
+
+		m_pCamera->SetFOV(45.0f);
+
+		m_pCamera->SetPerspective(false); //perspective view? False is Orthographic
+
+		m_pCamera->SetResolution(vector2(1280.0f, 720.0f)); //Resolution of the window
+		m_pCamera->SetNearFar(vector2(0.001f, 1000.0f)); //Near and Far planes
+
+		m_pCamera->SetHorizontalPlanes(vector2(-11.0f, 11.0f)); //Ortographic horizontal projection
+		m_pCamera->SetVerticalPlanes(vector2(-11.0f, 11.0f)); //Ortographic vertical projection
 		break;
 	case 4:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPosition(vector3(0.0f, 0.0f, -15.0f)); //Where my camera is located
+		m_pCamera->SetTarget(vector3(0.0f, 0.0f, 0.0f)); //What I'm looking at
+		m_pCamera->SetUp(vector3(0.0f, 1.0f, 0.0f)); //What is up
+
+		m_pCamera->SetFOV(45.0f);
+
+		m_pCamera->SetPerspective(true); //perspective view? False is Orthographic
+
+		m_pCamera->SetResolution(vector2(1280.0f, 720.0f)); //Resolution of the window
+		m_pCamera->SetNearFar(vector2(0.001f, 1000.0f)); //Near and Far planes
+
+		m_pCamera->SetHorizontalPlanes(vector2(-5.0f, 5.0f)); //Ortographic horizontal projection
+		m_pCamera->SetVerticalPlanes(vector2(-5.0f, 5.0f)); //Ortographic vertical projection
 		break;
 	case 5:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPosition(vector3(0.0f, 0.0f, -15.0f)); //Where my camera is located
+		m_pCamera->SetTarget(vector3(0.0f, 0.0f, 0.0f)); //What I'm looking at
+		m_pCamera->SetUp(vector3(0.0f, 1.0f, 0.0f)); //What is up
+
+		m_pCamera->SetFOV(45.0f);
+
+		m_pCamera->SetPerspective(true); //perspective view? False is Orthographic
+
+		m_pCamera->SetResolution(vector2(1280.0f, 720.0f)); //Resolution of the window
+		m_pCamera->SetNearFar(vector2(6.0f, 1000.0f)); //Near and Far planes
+
+		m_pCamera->SetHorizontalPlanes(vector2(-5.0f, 5.0f)); //Ortographic horizontal projection
+		m_pCamera->SetVerticalPlanes(vector2(-5.0f, 5.0f)); //Ortographic vertical projection
 		break;
 	case 6:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetPosition(vector3(0.0f, 0.0f, -15.0f)); //Where my camera is located
+		m_pCamera->SetTarget(vector3(0.0f, 0.0f, 0.0f)); //What I'm looking at
+		m_pCamera->SetUp(vector3(0.0f, 1.0f, 0.0f)); //What is up
+
+		m_pCamera->SetFOV(45.0f);
+
+		m_pCamera->SetPerspective(true); //perspective view? False is Orthographic
+
+		m_pCamera->SetResolution(vector2(1280.0f, 720.0f)); //Resolution of the window
+		m_pCamera->SetNearFar(vector2(0.001f, 10.0f)); //Near and Far planes
+
+		m_pCamera->SetHorizontalPlanes(vector2(-5.0f, 5.0f)); //Ortographic horizontal projection
+		m_pCamera->SetVerticalPlanes(vector2(-5.0f, 5.0f)); //Ortographic vertical projection
 		break;
 	case 7:
 		m_pCamera->ResetCamera();
+		m_pCamera->SetUp(vector3(0.0f, -1.0f, 0.0f));
 		break;
 	}
 
