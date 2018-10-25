@@ -28,6 +28,13 @@ class MyCamera
 
 	matrix4 m_m4View; //View matrix
 	matrix4 m_m4Projection; //Projection Matrix
+
+	//vector to deal with the rotation of the camera
+	vector3 m_v3Forward = vector3(0.0f, 0.0f, 0.0f);
+	vector3 m_v3Upward = vector3(0.0f, 0.0f, 0.0f);
+	vector3 m_v3Rightward = vector3(0.0f, 0.0f, 0.0f);
+
+
 public:
 	/*
 	USAGE: Constructor
@@ -230,6 +237,10 @@ public:
 	OUTPUT: ---
 	*/
 	void MoveSideways(float a_fDistance = 0.1f);
+
+	//Method header for change pitch and haw which is the vertical and horizontal view of the camera
+	void ChangePitch(float a_fFloat);
+	void ChangeYaw(float a_fFloat);
 };
 
 } //namespace Simplex
