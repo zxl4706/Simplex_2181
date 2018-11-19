@@ -13,7 +13,6 @@ namespace Simplex
 //System Class
 class MyRigidBody
 {
-	typedef MyRigidBody* PRigidBody; //Entity Pointer
 	MeshManager* m_pMeshMngr = nullptr; //for displaying the Rigid Body
 
 	bool m_bVisibleBS = false; //Visibility of bounding sphere
@@ -39,10 +38,11 @@ class MyRigidBody
 
 	matrix4 m_m4ToWorld = IDENTITY_M4; //Matrix that will take us from local to world coordinate
 
-	uint m_nCollidingCount = 0; //size of the colliding set
-	PRigidBody* m_CollidingArray = nullptr; //array of rigid bodies this one is colliding with
+	uint m_nCollidingSetSize = 0; //size of the colliding set
+	std::set<MyRigidBody*> m_CollidingRBSet; //set of rigid bodies this one is colliding with
 
 public:
+	void MakeCubic(void);
 	/*
 	Usage: Constructor
 	Arguments: std::vector<vector3> a_pointList -> list of points to make the Rigid Body for
@@ -200,7 +200,7 @@ public:
 	*/
 	vector3 GetCenterGlobal(void);
 	/*
-	Usage: Gets minimum vector in global space
+	Usage: Gets minimum vector in local space
 	Arguments: ---
 	Output: min vector
 	*/
@@ -230,12 +230,6 @@ public:
 	*/
 	void SetModelMatrix(matrix4 a_m4ModelMatrix);
 #pragma endregion
-	/*
-	USAGE: Checks if the input is in the colliding array
-	ARGUMENTS: MyRigidBody* a_pEntry -> Entry queried
-	OUTPUT: is it in the array?
-	*/
-	bool IsInCollidingArray(MyRigidBody* a_pEntry);
 	
 private:
 	/*

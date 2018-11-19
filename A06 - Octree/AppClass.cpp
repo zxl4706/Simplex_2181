@@ -10,27 +10,34 @@ void Application::InitVariables(void)
 
 	m_pLightMngr->SetPosition(vector3(0.0f, 3.0f, 13.0f), 1); //set the position of first light (0 is reserved for ambient light)
 
+	//Entity Manager
+	m_pEntityMngr = MyEntityManager::GetInstance();
+
 #ifdef DEBUG
-	uint uInstances = 900;
+	uint uInstances = 500;
 #else
 	uint uInstances = 1849;
 #endif
 	int nSquare = static_cast<int>(std::sqrt(uInstances));
-	m_uObjects = nSquare * nSquare;
-	uint uIndex = -1;
+	uInstances = nSquare * nSquare;
+	uint uIndex = 0;
+
 	for (int i = 0; i < nSquare; i++)
 	{
 		for (int j = 0; j < nSquare; j++)
 		{
-			uIndex++;
 			m_pEntityMngr->AddEntity("Minecraft\\Cube.obj");
 			vector3 v3Position = vector3(glm::sphericalRand(34.0f));
 			matrix4 m4Position = glm::translate(v3Position);
 			m_pEntityMngr->SetModelMatrix(m4Position);
+			uIndex++;
 		}
 	}
+
 	m_uOctantLevels = 1;
 	m_pEntityMngr->Update();
+	m_pRoot = new MyOctant(m_uOctantLevels, 5);
+
 }
 void Application::Update(void)
 {
@@ -55,7 +62,7 @@ void Application::Display(void)
 	ClearScreen();
 
 	//display octree
-	//m_pRoot->Display();
+	m_pRoot->Display();
 	
 	// draw a skybox
 	m_pMeshMngr->AddSkyboxToRenderList();
@@ -74,6 +81,7 @@ void Application::Display(void)
 }
 void Application::Release(void)
 {
+	SafeDelete(m_pRoot);
 	//release GUI
 	ShutdownGUI();
 }

@@ -1,6 +1,16 @@
 #include "MyRigidBody.h"
 using namespace Simplex;
 //Allocation
+void MyRigidBody::MakeCubic(void)
+{
+	float fSize = m_v3HalfWidth.x;
+	fSize = glm::max(fSize, m_v3HalfWidth.y);
+	fSize = glm::max(fSize, m_v3HalfWidth.z);
+	m_v3HalfWidth = vector3(fSize);
+	m_v3CenterG = m_v3CenterL;
+	m_v3MinL = m_v3MinG = m_v3CenterL - m_v3HalfWidth;
+	m_v3MaxL = m_v3MaxG = m_v3CenterL + m_v3HalfWidth;
+}
 void MyRigidBody::Init(void)
 {
 	m_pMeshMngr = MeshManager::GetInstance();
@@ -26,8 +36,7 @@ void MyRigidBody::Init(void)
 
 	m_m4ToWorld = IDENTITY_M4;
 
-	m_nCollidingCount = 0;
-	m_CollidingArray = nullptr;
+	m_nCollidingSetSize = 0;
 }
 void MyRigidBody::Swap(MyRigidBody& other)
 {
@@ -54,8 +63,8 @@ void MyRigidBody::Swap(MyRigidBody& other)
 
 	std::swap(m_m4ToWorld, other.m_m4ToWorld);
 
-	std::swap(m_nCollidingCount, other.m_nCollidingCount);
-	std::swap(m_CollidingArray, other.m_CollidingArray);
+	std::swap(m_nCollidingSetSize, other.m_nCollidingSetSize);
+	std::swap(m_CollidingRBSet, other.m_CollidingRBSet);
 }
 void MyRigidBody::Release(void)
 {
@@ -164,7 +173,7 @@ MyRigidBody::MyRigidBody(std::vector<vector3> a_pointList)
 	m_v3MaxG = m_v3MaxL;
 
 	//with the max and the min we calculate the center
-	m_v3CenterL = (m_v3MaxL + m_v3MinL) / 2.0f;
+	m_v3CenterG = m_v3CenterL = (m_v3MaxL + m_v3MinL) / 2.0f;
 
 	//we calculate the distance between min and max vectors
 	m_v3HalfWidth = (m_v3MaxL - m_v3MinL) / 2.0f;
@@ -198,8 +207,8 @@ MyRigidBody::MyRigidBody(MyRigidBody const& other)
 
 	m_m4ToWorld = other.m_m4ToWorld;
 
-	m_nCollidingCount = other.m_nCollidingCount;
-	m_CollidingArray = other.m_CollidingArray;
+	m_nCollidingSetSize = other.m_nCollidingSetSize;
+	m_CollidingRBSet = other.m_CollidingRBSet;
 }
 MyRigidBody& MyRigidBody::operator=(MyRigidBody const& other)
 {
@@ -216,82 +225,49 @@ MyRigidBody::~MyRigidBody() { Release(); };
 //--- other Methods
 void MyRigidBody::AddCollisionWith(MyRigidBody* other)
 {
-	//if its already in the list return
-	if (IsInCollidingArray(other))
-		return;
 	/*
 		check if the object is already in the colliding set, if
 		the object is already there return with no changes
 	*/
-
-	//insert the entry
-	PRigidBody* pTemp;
-	pTemp = new PRigidBody[m_nCollidingCount + 1];
-	if (m_CollidingArray)
-	{
-		memcpy(pTemp, m_CollidingArray, sizeof(MyRigidBody*) * m_nCollidingCount);
-		delete[] m_CollidingArray;
-		m_CollidingArray = nullptr;
-	}
-	pTemp[m_nCollidingCount] = other;
-	m_CollidingArray = pTemp;
-
-	++m_nCollidingCount;
+	auto element = m_CollidingRBSet.find(other);
+	if (element != m_CollidingRBSet.end())
+		return;
+	// we couldn't find the object so add it
+	m_CollidingRBSet.insert(other);
+	m_nCollidingSetSize = m_CollidingRBSet.size();
 }
 void MyRigidBody::RemoveCollisionWith(MyRigidBody* other)
 {
-	//if there are no dimensions return
-	if (m_nCollidingCount == 0)
+	//if the set is empty there is no need to remove
+	if (0 == m_nCollidingSetSize)
 		return;
 
-	//we look one by one if its the one wanted
-	for (uint i = 0; i < m_nCollidingCount; i++)
-	{
-		if (m_CollidingArray[i] == other)
-		{
-			//if it is, then we swap it with the last one and then we pop
-			std::swap(m_CollidingArray[i], m_CollidingArray[m_nCollidingCount - 1]);
-			PRigidBody* pTemp;
-			pTemp = new PRigidBody[m_nCollidingCount - 1];
-			if (m_CollidingArray)
-			{
-				memcpy(pTemp, m_CollidingArray, sizeof(uint) * (m_nCollidingCount - 1));
-				delete[] m_CollidingArray;
-				m_CollidingArray = nullptr;
-			}
-			m_CollidingArray = pTemp;
+	/*
+		Special note, even though erase will not break if we try to
+		erase a non existing rigid body from the set, checking first
+		improves the performance.
+	*/
 
-			--m_nCollidingCount;
-			return;
-		}
-	}
+	//Check if we have the object in the set first
+	if(m_CollidingRBSet.find(other)!= m_CollidingRBSet.end())
+		m_CollidingRBSet.erase(other);//remove from set
+
+	m_nCollidingSetSize = m_CollidingRBSet.size();
 }
 void MyRigidBody::ClearCollidingList(void)
 {
-	m_nCollidingCount = 0;
-	if (m_CollidingArray)
-	{
-		delete[] m_CollidingArray;
-		m_CollidingArray = nullptr;
-	}
+	m_CollidingRBSet.clear();
+	m_nCollidingSetSize = 0;
 }
 uint MyRigidBody::SAT(MyRigidBody* const a_pOther)
 {
+	// Since no separating axis found, the OBBs must be intersecting
 	/*
-	Your code goes here instead of this comment;
-
-	For this method, if there is an axis that separates the two objects
-	then the return will be different than 0; 1 for any separating axis
-	is ok if you are not going for the extra credit, if you could not
-	find a separating axis you need to return 0, there is an enum in
-	Simplex that might help you [eSATResults] feel free to use it.
-	(eSATResults::SAT_NONE has a value of 0)
+		This is not complete as this is the solution of an assignment
 	*/
-
-	//there is no axis test that separates this two objects
 	return 0;
 }
-bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
+bool MyRigidBody::IsColliding(MyRigidBody* const other)
 {
 	//check if spheres are colliding
 	bool bColliding = true;
@@ -299,36 +275,36 @@ bool MyRigidBody::IsColliding(MyRigidBody* const a_pOther)
 	//if they are check the Axis Aligned Bounding Box
 	if (bColliding) //they are colliding with bounding sphere
 	{
-		if (this->m_v3MaxG.x < a_pOther->m_v3MinG.x) //this to the right of other
+		if (this->m_v3MaxG.x < other->m_v3MinG.x) //this to the right of other
 			bColliding = false;
-		if (this->m_v3MinG.x > a_pOther->m_v3MaxG.x) //this to the left of other
-			bColliding = false;
-
-		if (this->m_v3MaxG.y < a_pOther->m_v3MinG.y) //this below of other
-			bColliding = false;
-		if (this->m_v3MinG.y > a_pOther->m_v3MaxG.y) //this above of other
+		if (this->m_v3MinG.x > other->m_v3MaxG.x) //this to the left of other
 			bColliding = false;
 
-		if (this->m_v3MaxG.z < a_pOther->m_v3MinG.z) //this behind of other
+		if (this->m_v3MaxG.y < other->m_v3MinG.y) //this below of other
 			bColliding = false;
-		if (this->m_v3MinG.z > a_pOther->m_v3MaxG.z) //this in front of other
+		if (this->m_v3MinG.y > other->m_v3MaxG.y) //this above of other
+			bColliding = false;
+
+		if (this->m_v3MaxG.z < other->m_v3MinG.z) //this behind of other
+			bColliding = false;
+		if (this->m_v3MinG.z > other->m_v3MaxG.z) //this in front of other
 			bColliding = false;
 
 		if (bColliding) //they are colliding with bounding box also
 		{
-			this->AddCollisionWith(a_pOther);
-			a_pOther->AddCollisionWith(this);
+			this->AddCollisionWith(other);
+			other->AddCollisionWith(this);
 		}
 		else //they are not colliding with bounding box
 		{
-			this->RemoveCollisionWith(a_pOther);
-			a_pOther->RemoveCollisionWith(this);
+			this->RemoveCollisionWith(other);
+			other->RemoveCollisionWith(this);
 		}
 	}
 	else //they are not colliding with bounding sphere
 	{
-		this->RemoveCollisionWith(a_pOther);
-		a_pOther->RemoveCollisionWith(this);
+		this->RemoveCollisionWith(other);
+		other->RemoveCollisionWith(this);
 	}
 	return bColliding;
 }
@@ -337,33 +313,23 @@ void MyRigidBody::AddToRenderList(void)
 {
 	if (m_bVisibleBS)
 	{
-		if (m_nCollidingCount > 0)
+		if (m_CollidingRBSet.size() > 0)
 			m_pMeshMngr->AddWireSphereToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(vector3(m_fRadius)), C_BLUE_CORNFLOWER);
 		else
 			m_pMeshMngr->AddWireSphereToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(vector3(m_fRadius)), C_BLUE_CORNFLOWER);
 	}
 	if (m_bVisibleOBB)
 	{
-		if (m_nCollidingCount > 0)
+		if (m_CollidingRBSet.size() > 0)
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(m_v3HalfWidth * 2.0f), m_v3ColorColliding);
 		else
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_m4ToWorld, m_v3CenterL) * glm::scale(m_v3HalfWidth * 2.0f), m_v3ColorNotColliding);
 	}
 	if (m_bVisibleARBB)
 	{
-		if (m_nCollidingCount > 0)
+		if (m_CollidingRBSet.size() > 0)
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), C_YELLOW);
 		else
 			m_pMeshMngr->AddWireCubeToRenderList(glm::translate(m_v3CenterG) * glm::scale(m_v3ARBBSize), C_YELLOW);
 	}
-}
-bool MyRigidBody::IsInCollidingArray(MyRigidBody* a_pEntry)
-{
-	//see if the entry is in the set
-	for (uint i = 0; i < m_nCollidingCount; i++)
-	{
-		if (m_CollidingArray[i] == a_pEntry)
-			return true;
-	}
-	return false;
 }
